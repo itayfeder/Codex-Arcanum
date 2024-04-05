@@ -197,6 +197,8 @@ function generate_card_ui(_c, full_UI_table, specific_vars, card_type, badges, h
         info_queue[#info_queue+1] = {key = 'eternal', set = 'Other'} 
       end
       localize{type = 'descriptions', key = _c.key, set = _c.set, nodes = desc_nodes, vars = loc_vars}
+    elseif hide_desc then
+      localize{type = 'other', key = 'undiscovered_'..(string.lower(_c.set)), set = _c.set, nodes = desc_nodes}
     elseif _c.set == 'Booster' and _c.name:find("Alchemy") then 
       local desc_override = 'p_arcana_normal'
       if _c.name == 'Alchemy Pack' then desc_override = 'p_alchemy_normal'; loc_vars = {_c.config.choose, _c.config.extra} end
@@ -212,6 +214,7 @@ function generate_card_ui(_c, full_UI_table, specific_vars, card_type, badges, h
         info_queue[#info_queue+1] = G.P_CENTERS.m_stone
       end
       localize{type = 'descriptions', key = _c.key, set = _c.set, nodes = desc_nodes, vars = specific_vars or {}}
+      
     end
 
     if main_end then 
@@ -250,71 +253,67 @@ function generate_card_ui(_c, full_UI_table, specific_vars, card_type, badges, h
 
     return full_UI_table
   end
+  
   return generate_card_uiref(_c, full_UI_table, specific_vars, card_type, badges, hide_desc, main_start, main_end)
 end
 
 local generate_UIBox_ability_tableref = Card.generate_UIBox_ability_table
 function Card:generate_UIBox_ability_table()
-  local card_type, hide_desc = self.ability.set or "None", nil
-  local loc_vars = nil
-  local main_start, main_end = nil, nil
-  local no_badge = nil
-  local is_custom = false
+  if self.ability.set == 'Alchemical' then
+    local card_type, hide_desc = self.ability.set or "None", nil
+    local loc_vars = nil
+    local main_start, main_end = nil, nil
+    local no_badge = nil
+    local is_custom = false
 
-  if not self.bypass_lock and self.config.center.unlocked ~= false and
-  (self.ability.set == 'Joker' or self.ability.set == 'Edition' or self.ability.consumeable or self.ability.set == 'Voucher' or self.ability.set == 'Booster') and
-  not self.config.center.discovered and 
-  ((self.area ~= G.jokers and self.area ~= G.consumeables and self.area) or not self.area) then
-      card_type = 'Undiscovered'
-  end    
-  if self.config.center.unlocked == false and not self.bypass_lock then --For everyting that is locked
-      card_type = "Locked"
-      if self.area and self.area == G.shop_demo then loc_vars = {}; no_badge = true end
-  elseif card_type == 'Undiscovered' and not self.bypass_discovery_ui then -- Any Joker or tarot/planet/voucher that is not yet discovered
-      hide_desc = true
-  elseif self.debuff then
-      loc_vars = { debuffed = true, playing_card = not not self.base.colour, value = self.base.value, suit = self.base.suit, colour = self.base.colour }
-  elseif card_type == 'Default' or card_type == 'Enhanced' then
-      loc_vars = { playing_card = not not self.base.colour, value = self.base.value, suit = self.base.suit, colour = self.base.colour,
-                  nominal_chips = self.base.nominal > 0 and self.base.nominal or nil,
-                  bonus_chips = (self.ability.bonus + (self.ability.perma_bonus or 0)) > 0 and (self.ability.bonus + (self.ability.perma_bonus or 0)) or nil,
-              }
-  elseif self.ability.set == 'Joker' then
-    if self.ability.name == 'Essence of Comedy' then is_custom = true; loc_vars = {self.ability.extra, self.ability.x_mult}
-    elseif self.ability.name == 'Bottled Buffoon' then is_custom = true; loc_vars = {self.ability.extra.every + 1, localize{type = 'variable', key = (self.ability.loyalty_remaining == 0 and 'loyalty_active' or 'loyalty_inactive'), vars = {self.ability.loyalty_remaining}}}
-    elseif self.ability.name == 'Shock Humor' then is_custom = true; loc_vars = {''..(G.GAME and G.GAME.probabilities.normal or 1), self.ability.extra.odds}
-    elseif self.ability.name == 'Catalyst Joker' then is_custom = true; loc_vars = {self.ability.extra.bonus, 1 + self.ability.extra.bonus*(self.ability.consumeable_tally or 0)} end
-  elseif self.ability.set == 'Alchemical' then
-    if self.ability.name == 'Cobalt' then 
-      sendDebugMessage("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-      sendDebugMessage(localize(G.GAME.last_played_hand, 'poker_hands'))
-      is_custom = true; 
-      loc_vars = {localize(G.GAME.last_played_hand, 'poker_hands') or localize('High Card', 'poker_hands')} 
+    if not self.bypass_lock and self.config.center.unlocked ~= false and
+    (self.ability.set == 'Joker' or self.ability.set == 'Edition' or self.ability.consumeable or self.ability.set == 'Voucher' or self.ability.set == 'Booster') and
+    not self.config.center.discovered and 
+    ((self.area ~= G.jokers and self.area ~= G.consumeables and self.area) or not self.area) then
+        card_type = 'Undiscovered'
+    end    
+    if self.config.center.unlocked == false and not self.bypass_lock then --For everyting that is locked
+        card_type = "Locked"
+        if self.area and self.area == G.shop_demo then loc_vars = {}; no_badge = true end
+    elseif card_type == 'Undiscovered' and not self.bypass_discovery_ui then -- Any Joker or tarot/planet/voucher that is not yet discovered
+        hide_desc = true
+    elseif self.debuff then
+        loc_vars = { debuffed = true, playing_card = not not self.base.colour, value = self.base.value, suit = self.base.suit, colour = self.base.colour }
+    elseif card_type == 'Default' or card_type == 'Enhanced' then
+        loc_vars = { playing_card = not not self.base.colour, value = self.base.value, suit = self.base.suit, colour = self.base.colour,
+                    nominal_chips = self.base.nominal > 0 and self.base.nominal or nil,
+                    bonus_chips = (self.ability.bonus + (self.ability.perma_bonus or 0)) > 0 and (self.ability.bonus + (self.ability.perma_bonus or 0)) or nil,
+                }
+    elseif self.ability.set == 'Alchemical' then
+      if self.ability.name == 'Cobalt' then 
+          is_custom = true; 
+          oc_vars = {localize(G.GAME.last_played_hand, 'poker_hands') or localize('High Card', 'poker_hands')} 
+      end
     end
-  end
 
-  if is_custom then
-    local badges = {}
-    if (card_type ~= 'Locked' and card_type ~= 'Undiscovered' and card_type ~= 'Default') or self.debuff then
-        badges.card_type = card_type
-    end
-    if self.ability.set == 'Joker' and self.bypass_discovery_ui and (not no_badge) then
-        badges.force_rarity = true
-    end
-    if self.edition then
-        if self.edition.type == 'negative' and self.ability.consumeable then
-            badges[#badges + 1] = 'negative_consumable'
-        else
-            badges[#badges + 1] = (self.edition.type == 'holo' and 'holographic' or self.edition.type)
-        end
-    end
-    if self.seal then badges[#badges + 1] = string.lower(self.seal)..'_seal' end
-    if self.ability.eternal then badges[#badges + 1] = 'eternal' end
-    if self.pinned then badges[#badges + 1] = 'pinned_left' end
+    if is_custom then
+      local badges = {}
+      if (card_type ~= 'Locked' and card_type ~= 'Undiscovered' and card_type ~= 'Default') or self.debuff then
+          badges.card_type = card_type
+      end
+      if self.ability.set == 'Joker' and self.bypass_discovery_ui and (not no_badge) then
+          badges.force_rarity = true
+      end
+      if self.edition then
+          if self.edition.type == 'negative' and self.ability.consumeable then
+              badges[#badges + 1] = 'negative_consumable'
+          else
+              badges[#badges + 1] = (self.edition.type == 'holo' and 'holographic' or self.edition.type)
+          end
+      end
+      if self.seal then badges[#badges + 1] = string.lower(self.seal)..'_seal' end
+      if self.ability.eternal then badges[#badges + 1] = 'eternal' end
+      if self.pinned then badges[#badges + 1] = 'pinned_left' end
 
-    if self.sticker then loc_vars = loc_vars or {}; loc_vars.sticker=self.sticker end
+      if self.sticker then loc_vars = loc_vars or {}; loc_vars.sticker=self.sticker end
 
-    return generate_card_ui(self.config.center, nil, loc_vars, card_type, badges, hide_desc, main_start, main_end)
+      return generate_card_ui(self.config.center, nil, loc_vars, card_type, badges, hide_desc, main_start, main_end)
+    end
   end
   
   return generate_UIBox_ability_tableref(self)
@@ -1348,7 +1347,7 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local studious_joker = SMODS.Joker:new("Studious Joker", "studious_joker", {mult = 4}, { x = 0, y = 0 }, studious_joker_def, 1, 5, false, false, true, true, "Mult")
+  local studious_joker = SMODS.Joker:new("Studious Joker", "studious_joker", {mult = 4}, { x = 0, y = 0 }, studious_joker_def, 1, 5, true, false, true, true, "Mult")
   SMODS.Sprite:new("j_studious_joker", rota_mod.path, "j_studious_joker.png", 71, 95, "asset_atli"):register();
   studious_joker:register()
 
@@ -1363,7 +1362,7 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local chain_reaction = SMODS.Joker:new("Chain Reaction", "chain_reaction", { extra = {used = false} }, { x = 0, y = 0 }, chain_reaction_def, 1, 5, false, false, true, true)
+  local chain_reaction = SMODS.Joker:new("Chain Reaction", "chain_reaction", { extra = {used = false} }, { x = 0, y = 0 }, chain_reaction_def, 1, 5, true, false, true, true)
   SMODS.Sprite:new("j_chain_reaction", rota_mod.path, "j_chain_reaction.png", 71, 95, "asset_atli"):register();
   chain_reaction:register()
 
@@ -1378,9 +1377,13 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local bottled_buffoon = SMODS.Joker:new("Bottled Buffoon", "bottled_buffoon", {extra = {every = 5, remaining = "5 remaining"}}, { x = 0, y = 0 }, bottled_buffoon_def, 1, 5, false, false, true, true)
+  local bottled_buffoon = SMODS.Joker:new("Bottled Buffoon", "bottled_buffoon", {extra = {every = 5, remaining = "5 remaining"}}, { x = 0, y = 0 }, bottled_buffoon_def, 1, 5, true, false, true, true)
   SMODS.Sprite:new("j_bottled_buffoon", rota_mod.path, "j_bottled_buffoon.png", 71, 95, "asset_atli"):register();
   bottled_buffoon:register()
+  
+  function SMODS.Jokers.j_bottled_buffoon.loc_def(card)
+    return {card.ability.extra.every + 1, localize{type = 'variable', key = (card.ability.loyalty_remaining == 0 and 'loyalty_active' or 'loyalty_inactive'), vars = {card.ability.loyalty_remaining}}}
+  end
 
   
   -- Essence of Comedy
@@ -1393,9 +1396,13 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local essence_of_comedy = SMODS.Joker:new("Essence of Comedy", "essence_of_comedy", {extra = 0.1, Xmult = 1}, { x = 0, y = 0 }, essence_of_comedy_def, 2, 6, false, false, true, true)
+  local essence_of_comedy = SMODS.Joker:new("Essence of Comedy", "essence_of_comedy", {extra = 0.1, Xmult = 1}, { x = 0, y = 0 }, essence_of_comedy_def, 2, 6, true, false, true, true)
   SMODS.Sprite:new("j_essence_of_comedy", rota_mod.path, "j_essence_of_comedy.png", 71, 95, "asset_atli"):register();
   essence_of_comedy:register()
+  
+  function SMODS.Jokers.j_essence_of_comedy.loc_def(card)
+    return {card.ability.extra, card.ability.x_mult}
+  end
 
   
   -- Shock Humor
@@ -1409,10 +1416,14 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local shock_humor = SMODS.Joker:new("Shock Humor", "shock_humor", {extra = {odds = 5}}, { x = 0, y = 0 }, shock_humor_def, 2, 5, false, false, true, true)
+  local shock_humor = SMODS.Joker:new("Shock Humor", "shock_humor", {extra = {odds = 5}}, { x = 0, y = 0 }, shock_humor_def, 2, 5, true, false, true, true)
   SMODS.Sprite:new("j_shock_humor", rota_mod.path, "j_shock_humor.png", 71, 95, "asset_atli"):register();
   shock_humor:register()
-
+  
+  function SMODS.Jokers.j_shock_humor.loc_def(card)
+    return {''..(G.GAME and G.GAME.probabilities.normal or 1), card.ability.extra.odds}
+  end
+  
 
   -- Breaking Bozo
   local breaking_bozo_def = {
@@ -1424,7 +1435,7 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local breaking_bozo = SMODS.Joker:new("Breaking Bozo", "breaking_bozo", {}, { x = 0, y = 0 }, breaking_bozo_def, 3, 7, false, false, true, true)
+  local breaking_bozo = SMODS.Joker:new("Breaking Bozo", "breaking_bozo", {}, { x = 0, y = 0 }, breaking_bozo_def, 3, 7, true, false, true, true)
   SMODS.Sprite:new("j_breaking_bozo", rota_mod.path, "j_breaking_bozo.png", 71, 95, "asset_atli"):register();
   breaking_bozo:register()
 
@@ -1440,9 +1451,13 @@ function SMODS.INIT.CodexArcanum()
     }
   }
 
-  local catalyst_joker = SMODS.Joker:new("Catalyst Joker", "catalyst_joker", {extra = {slots = 2, bonus = 1}}, { x = 0, y = 0 }, catalyst_joker_def, 3, 6, false, false, true, true)
+  local catalyst_joker = SMODS.Joker:new("Catalyst Joker", "catalyst_joker", {extra = {slots = 2, bonus = 1}}, { x = 0, y = 0 }, catalyst_joker_def, 3, 6, true, false, true, true)
   SMODS.Sprite:new("j_catalyst_joker", rota_mod.path, "j_catalyst_joker.png", 71, 95, "asset_atli"):register();
   catalyst_joker:register()
+
+  function SMODS.Jokers.j_catalyst_joker.loc_def(card)
+    return {card.ability.extra.bonus, 1 + card.ability.extra.bonus*(card.ability.consumeable_tally or 0)}
+  end
 
 
 
