@@ -315,7 +315,7 @@ function Card:generate_UIBox_ability_table()
       return generate_card_ui(self.config.center, nil, loc_vars, card_type, badges, hide_desc, main_start, main_end)
     end
   end
-  
+
   return generate_UIBox_ability_tableref(self)
 end
 
@@ -1190,7 +1190,7 @@ function SMODS.INIT.CodexArcanum()
   local alchemy_salt_def = {
     name = "Salt",
     text = {
-        "Gain {C:attention}+2{} tags"
+        "Gain {C:attention}2{} tags"
     }
   }
 
@@ -1201,7 +1201,7 @@ function SMODS.INIT.CodexArcanum()
   local alchemy_sulfur_def = {
     name = "Sulfur",
     text = {
-        "Gain {C:attention}10${} "
+        "Gain {C:attention}10${}"
     }
   }
 
@@ -1227,7 +1227,7 @@ function SMODS.INIT.CodexArcanum()
       "Converts up to",
       "{C:attention}2{} selected cards",
       "to {C:dark_edition}Polychrome",
-      "for 1 blind"
+      "for one blind"
     }
   }
 
