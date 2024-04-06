@@ -13,7 +13,7 @@ G.localization.descriptions.Alchemical = {}
 G.localization.misc.dictionary["k_alchemical"] = "Alchemical"
 G.localization.misc.dictionary["p_plus_alchemical"] = "+1 Alchemical"
 G.localization.misc.dictionary["p_alchemy_plus_card"] = "+2 Cards"
-G.localization.misc.dictionary["p_alchemy_plus_money"] = "+2 Dollars"
+G.localization.misc.dictionary["p_alchemy_plus_money"] = "+5 Dollars"
 G.localization.misc.dictionary["p_alchemy_reduce_blind"] = "Reduce Blind"
 
 
@@ -1090,36 +1090,29 @@ function SMODS.Booster:register()
 	G.P_CENTERS[self.slug] = booster_obj
 	table.insert(G.P_CENTER_POOLS['Booster'], booster_obj)
 
-	-- Load it
-	for g_k, group in pairs(G.localization) do
-		if g_k == 'descriptions' then
-			for _, set in pairs(group) do
-				for _, center in pairs(set) do
-					center.text_parsed = {}
-					for _, line in ipairs(center.text) do
-						center.text_parsed[#center.text_parsed + 1] = loc_parse_string(line)
-					end
-					center.name_parsed = {}
-					for _, line in ipairs(type(center.name) == 'table' and center.name or {center.name}) do
-						center.name_parsed[#center.name_parsed + 1] = loc_parse_string(line)
-					end
-					if center.unlock then
-						center.unlock_parsed = {}
-						for _, line in ipairs(center.unlock) do
-							center.unlock_parsed[#center.unlock_parsed + 1] = loc_parse_string(line)
-						end
-					end
-				end
-			end
-		end
-	end
-
 	sendDebugMessage("The Booster named " .. self.name .. " with the slug " .. self.slug ..
 						 " have been registered at the id " .. id .. ".")
 end
 
 -- BOOSTER API
 
+local init_item_prototypes_ref = Game.init_item_prototypes
+function Game:init_item_prototypes()
+  init_item_prototypes_ref(self)
+
+  G.C.SECONDARY_SET.Alchemy = HEX("C09D75")
+  G.P_CENTER_POOLS.Alchemical = {}
+  G.localization.descriptions.Alchemical = {}
+
+  for _, booster in pairs(SMODS.Boosters) do
+    booster:register()
+  end
+  for _, alchemical in pairs(CodexArcanum.Alchemicals) do
+    alchemical:register()
+  end
+  SMODS.LOAD_LOC()
+  SMODS.SAVE_UNLOCKS()
+end
 
 
 
@@ -1507,7 +1500,8 @@ function SMODS.INIT.CodexArcanum()
   philosopher_deck:register()
 
 
-  SMODS:SAVE_UNLOCKS()
+  SMODS.LOAD_LOC()
+  SMODS.SAVE_UNLOCKS()
 end
 
 ----------------------------------------------
