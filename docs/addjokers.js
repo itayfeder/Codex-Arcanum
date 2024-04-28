@@ -412,7 +412,7 @@ let jokers = [
       x: 2,
       y: 1
     },
-    rarity: "Uncommon"
+    rarity: "Rare"
   },
   {
     name: "Catalyst Joker",
@@ -426,7 +426,7 @@ let jokers = [
       x: 0,
       y: 2
     },
-    rarity: "Uncommon"
+    rarity: "Rare"
   }
 ]
 
