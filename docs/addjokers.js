@@ -487,14 +487,32 @@ let card_modifications = [
 ]
 
 let decks = [
-  // {
-  //   name: "Joker",
-  //   text: [
-  //     "{C:mult}+4{} Mult"
-  //   ],
-  //   image_url: "img/j_joker.png",
-  //   rarity: "Deck"
-  // },
+  {
+    name: "Philosopher's Deck",
+    text: [
+      "Start run with the",
+      "{C:tarot,T:v_alchemical_merchant}Alchemical Merchant{} voucher and a copy of {C:tarot,T:c_seeker}The Seeker{}"
+    ],
+    image_url: "img/ca_decks_atlas.png",
+    image_pos: {
+      x: 0,
+      y: 0
+    },
+    rarity: "Deck"
+  },
+  {
+    name: "Herbalist's Deck",
+    text: [
+      "Start run with the",
+      "{C:tarot,T:v_mortar_and_pestle}Mortar and Pestle{} voucher. Gain an {C:alchemical}Alchemical{} card before each boss blind"
+    ],
+    image_url: "img/ca_decks_atlas.png",
+    image_pos: {
+      x: 1,
+      y: 0
+    },
+    rarity: "Deck"
+  },
 ]
 
 let stickers = [
