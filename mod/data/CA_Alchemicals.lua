@@ -286,7 +286,7 @@ function CodexArcanum.INIT.CA_Alchemicals()
     alchemy_arsenic:register()
             
     function CodexArcanum.Alchemicals.c_alchemy_arsenic.can_use(card)
-        return true
+        return G.GAME.current_round.discards_left ~= 0
     end
 
     function CodexArcanum.Alchemicals.c_alchemy_arsenic.use(card, area, copier)
